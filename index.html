@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Speed Game</title>
+    <style>
+        :root {
+            --bg-color-light: #f4f4f9;
+            --text-color-light: #333;
+            --primary-color-light: #007bff;
+            --container-bg-light: #fff;
+            --input-bg-light: #f0f0f0;
+            --button-hover-light: #0056b3;
+
+            --bg-color-dark: #121212;
+            --text-color-dark: #f4f4f9;
+            --primary-color-dark: #bb86fc;
+            --container-bg-dark: #1e1e1e;
+            --input-bg-dark: #333;
+            --button-hover-dark: #9a67d4;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .light-mode {
+            background-color: var(--bg-color-light);
+            color: var(--text-color-light);
+        }
+
+        .dark-mode {
+            background-color: var(--bg-color-dark);
+            color: var(--text-color-dark);
+        }
+
+        .container {
+            background: var(--container-bg-light);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            transition: background-color 0.3s;
+        }
+
+        .dark-mode .container {
+            background: var(--container-bg-dark);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .theme-switcher {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .theme-switcher input {
+            display: none;
+        }
+
+        .slider {
+            width: 50px;
+            height: 25px;
+            background-color: #ccc;
+            border-radius: 25px;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+
+        .slider:before {
+            content: '';
+            position: absolute;
+            width: 21px;
+            height: 21px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .theme-switcher input:checked + .slider {
+            background-color: var(--primary-color-dark);
+        }
+
+        .theme-switcher input:checked + .slider:before {
+            transform: translateX(25px);
+        }
+
+        .profile-section {
+            margin-bottom: 1.5rem;
+        }
+
+        #profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-color-light);
+            margin-bottom: 1rem;
+        }
+        
+        .dark-mode #profile-pic {
+            border-color: var(--primary-color-dark);
+        }
+
+        #photo-upload {
+            display: none;
+        }
+
+        .button {
+            background-color: var(--primary-color-light);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            margin: 0 5px;
+        }
+        
+        .dark-mode .button {
+             background-color: var(--primary-color-dark);
+        }
+
+        .button:hover {
+            background-color: var(--button-hover-light);
+        }
+        
+        .dark-mode .button:hover {
+            background-color: var(--button-hover-dark);
+        }
+
+        #remove-photo-btn {
+            background-color: #dc3545;
+        }
+        #remove-photo-btn:hover {
+            background-color: #c82333;
+        }
+
+        #word-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            letter-spacing: 2px;
+            color: var(--primary-color-light);
+        }
+        
+        .dark-mode #word-display {
+            color: var(--primary-color-dark);
+        }
+
+        #typing-input {
+            width: 80%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+            text-align: center;
+            background-color: var(--input-bg-light);
+            color: var(--text-color-light);
+            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+        }
+        
+        .dark-mode #typing-input {
+            background-color: var(--input-bg-dark);
+            color: var(--text-color-dark);
+            border-color: #555;
+        }
+
+        #typing-input:focus {
+            outline: none;
+            border-color: var(--primary-color-light);
+        }
+        
+        .dark-mode #typing-input:focus {
+            border-color: var(--primary-color-dark);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 2rem;
+            font-size: 1.2rem;
+        }
+
+        .stat-box {
+            padding: 10px 20px;
+        }
+        
+        .stat-box h4 {
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+            color: #888;
+        }
+        
+        .dark-mode .stat-box h4 {
+            color: #aaa;
+        }
+
+        .stat-box p {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem;
+            }
+            #word-display {
+                font-size: 2rem;
+            }
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            .stat-box {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="light-mode">
+
+    <div class="container">
+        <div class="header">
+            <h2>Typing Pro</h2>
+            <label class="theme-switcher">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="profile-section">
+            <img src="https://i.ibb.co/T1g1x6b/default-avatar.png" alt="Profile Picture" id="profile-pic">
+            <div>
+                <input type="file" id="photo-upload" accept="image/*">
+                <button class="button" onclick="document.getElementById('photo-upload').click()">Upload Photo</button>
+                <button class="button" id="remove-photo-btn" style="display: none;">Remove Photo</button>
+            </div>
+        </div>
+
+        <h3 id="word-display">Welcome</h3>
+        <input type="text" id="typing-input" placeholder="Start typing here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+
+        <div class="stats">
+            <div class="stat-box">
+                <h4>Time Left</h4>
+                <p id="time-left">60s</p>
+            </div>
+            <div class="stat-box">
+                <h4>WPM</h4>
+                <p id="wpm">0</p>
+            </div>
+            <div class="stat-box">
+                <h4>Accuracy</h4>
+                <p id="accuracy">100%</p>
+            </div>
+        </div>
+        
+        <button class="button" id="start-btn" style="margin-top: 2rem;">Start Game</button>
+    </div>
+
+    <script>
+        const words = [
+            'ability', 'able', 'about', 'above', 'accept', 'according', 'account', 'across', 'action', 'activity',
+            'actually', 'address', 'admit', 'adult', 'affect', 'after', 'again', 'against', 'agency', 'agent',
+            'ago', 'agree', 'agreement', 'ahead', 'allow', 'almost', 'alone', 'along', 'already', 'also',
+            'although', 'always', 'American', 'among', 'amount', 'analysis', 'animal', 'another', 'answer',
+            'anyone', 'anything', 'appear', 'apply', 'approach', 'area', 'argue', 'around', 'arrive', 'article',
+            'artist', 'assume', 'attack', 'attention', 'attorney', 'audience', 'author', 'authority', 'available',
+            'avoid', 'away', 'baby', 'back', 'balance', 'become', 'because', 'before', 'begin', 'behavior',
+            'behind', 'believe', 'benefit', 'best', 'better', 'between', 'beyond', 'billion', 'black', 'blood',
+            'board', 'body', 'book', 'born', 'both', 'break', 'bring', 'brother', 'budget', 'build', 'building',
+            'business', 'call', 'camera', 'campaign', 'cancer', 'candidate', 'capital', 'card', 'care', 'career',
+            'carry', 'case', 'catch', 'cause', 'cell', 'center', 'central', 'century', 'certain', 'certainly',
+            'chair', 'challenge', 'chance', 'change', 'character', 'charge', 'check', 'child', 'choice', 'choose',
+            'church', 'citizen', 'city', 'civil', 'claim', 'class', 'clear', 'clearly', 'close', 'coach', 'cold',
+            'collection', 'college', 'color', 'come', 'commercial', 'common', 'community', 'company', 'compare',
+            'computer', 'concern', 'condition', 'conference', 'Congress', 'consider', 'consumer', 'contain',
+            'continue', 'control', 'cost', 'could', 'country', 'couple', 'course', 'court', 'cover', 'create',
+            'crime', 'cultural', 'culture', 'current', 'customer', 'dark', 'data', 'daughter', 'dead', 'deal',
+            'death', 'debate', 'decade', 'decide', 'decision', 'deep', 'defense', 'degree', 'Democrat', 'democratic',
+            'describe', 'design', 'despite', 'detail', 'determine', 'develop', 'development', 'difference',
+            'different', 'difficult', 'dinner', 'direction', 'director', 'discover', 'discuss', 'discussion',
+            'disease', 'doctor', 'door', 'down', 'draw', 'dream', 'drive', 'drop', 'drug', 'during', 'each',
+            'early', 'east', 'easy', 'economic', 'economy', 'edge', 'education', 'effect', 'effort', 'eight',
+            'either', 'election', 'else', 'employee', 'energy', 'enjoy', 'enough', 'enter', 'entire', 'environment',
+            'environmental', 'especially', 'establish', 'even', 'evening', 'event', 'ever', 'every', 'everybody',
+            'everyone', 'everything', 'evidence', 'exactly', 'example', 'executive', 'exist', 'expect', 'experience',
+            'expert', 'explain', 'face', 'fact', 'factor', 'fail', 'fall', 'family', 'father', 'fear', 'federal',
+            'feel', 'feeling', 'field', 'fight', 'figure', 'fill', 'film', 'final', 'finally', 'financial', 'find',
+            'fine', 'finger', 'finish', 'fire', 'firm', 'first', 'fish', 'five', 'floor', 'fly', 'focus', 'follow',
+            'food', 'foot', 'force', 'foreign', 'forget', 'form', 'former', 'forward', 'four', 'free', 'friend',
+            'from', 'front', 'full', 'fund', 'future', 'game', 'garden', 'general', 'generation', 'girl', 'give',
+            'glass', 'goal', 'good', 'government', 'great', 'green', 'ground', 'group', 'grow', 'growth', 'guess',
+            'hand', 'hang', 'happen', 'happy', 'hard', 'have', 'head', 'health', 'hear', 'heart', 'heat', 'heavy',
+            'help', 'her', 'here', 'herself', 'high', 'him', 'himself', 'his', 'history', 'hold', 'home', 'hope',
+            'hospital', 'hot', 'hotel', 'hour', 'house', 'how', 'however', 'huge', 'human', 'hundred', 'husband',
+            'idea', 'identify', 'image', 'imagine', 'impact', 'important', 'improve', 'include', 'including',
+            'increase', 'indeed', 'indicate', 'individual', 'industry', 'information', 'inside', 'instead',
+            'institution', 'interest', 'interesting', 'international', 'interview', 'into', 'investment',
+            'involve', 'issue', 'item', 'its', 'itself', 'job', 'join', 'just', 'keep', 'key', 'kill', 'kind',
+            'kitchen', 'know', 'knowledge', 'land', 'language', 'large', 'last', 'late', 'later', 'laugh', 'law',
+            'lawyer', 'lay', 'lead', 'leader', 'learn', 'least', 'leave', 'left', 'leg', 'legal', 'less', 'let',
+            'letter', 'level', 'lie', 'life', 'light', 'like', 'likely', 'line', 'list', 'listen', 'little', 'live',
+            'local', 'long', 'look', 'lose', 'loss', 'love', 'low', 'machine', 'magazine', 'main', 'maintain',
+            'major', 'majority', 'make', 'man', 'manage', 'management', 'manager', 'many', 'market', 'marriage',
+            'material', 'matter', 'may', 'maybe', 'mean', 'measure', 'media', 'medical', 'meet', 'meeting',
+            'member', 'memory', 'mention', 'message', 'method', 'middle', 'might', 'military', 'million', 'mind',
+            'minute', 'miss', 'mission', 'model', 'modern', 'moment', 'money', 'month', 'more', 'morning', 'most',
+            'mother', 'mouth', 'move', 'movement', 'movie', 'much', 'music', 'must', 'myself', 'name', 'nation',
+            'national', 'natural', 'nature', 'near', 'nearly', 'necessary', 'need', 'network', 'never', 'new',
+            'news', 'newspaper', 'next', 'nice', 'night', 'north', 'note', 'nothing', 'notice', 'now', 'number',
+            'occur', 'off', 'offer', 'office', 'officer', 'official', 'often', 'once', 'one', 'only', 'onto',
+            'open', 'operation', 'opportunity', 'option', 'order', 'organization', 'other', 'others', 'our',
+            'out', 'outside', 'over', 'own', 'owner', 'page', 'pain', 'painting', 'paper', 'parent', 'part',
+            'participant', 'particular', 'particularly', 'partner', 'party', 'pass', 'past', 'patient', 'pattern',
+            'pay', 'peace', 'people', 'per', 'perform', 'performance', 'perhaps', 'period', 'person', 'personal',
+            'phone', 'physical', 'pick', 'picture', 'piece', 'place', 'plan', 'plant', 'play', 'player', 'point',
+            'police', 'policy', 'political', 'politics', 'poor', 'popular', 'population', 'position', 'positive',
+            'possible', 'power', 'practice', 'prepare', 'present', 'president', 'pressure', 'pretty', 'prevent',
+            'price', 'private', 'probably', 'problem', 'process', 'produce', 'product', 'production', 'professional',
+            'professor', 'program', 'project', 'property', 'protect', 'prove', 'provide', 'public', 'pull',
+            'purpose', 'push', 'put', 'quality', 'question', 'quickly', 'quite', 'race', 'radio', 'raise', 'range',
+            'rate', 'rather', 'reach', 'read', 'ready', 'real', 'reality', 'realize', 'really', 'reason', 'receive',
+            'recent', 'recently', 'recognize', 'record', 'red', 'reduce', 'reflect', 'region', 'relate',
+            'relationship', 'religious', 'remain', 'remember', 'remove', 'report', 'represent', 'Republican',
+            'require', 'research', 'resource', 'respond', 'response', 'responsibility', 'rest', 'result', 'return',
+            'reveal', 'rich', 'right', 'rise', 'risk', 'road', 'rock', 'role', 'room', 'rule', 'run', 'safe',
+            'same', 'save', 'say', 'scene', 'school', 'science', 'scientist', 'score', 'sea', 'season', 'seat',
+            'second', 'section', 'security', 'see', 'seek', 'seem', 'sell', 'send', 'senior', 'sense', 'series',
+            'serious', 'serve', 'service', 'set', 'seven', 'several', 'sex', 'sexual', 'shake', 'share', 'she',
+            'shoot', 'short', 'shot', 'should', 'shoulder', 'show', 'side', 'sign', 'significant', 'similar',
+            'simple', 'simply', 'since', 'sing', 'single', 'sister', 'sit', 'site', 'situation', 'six', 'size',
+            'skill', 'skin', 'small', 'smile', 'social', 'society', 'soldier', 'some', 'somebody', 'someone',
+            'something', 'sometimes', 'son', 'song', 'soon', 'sort', 'sound', 'source', 'south', 'southern',
+            'space', 'speak', 'special', 'specific', 'speech', 'spend', 'sport', 'spring', 'staff', 'stage',
+            'stand', 'standard', 'star', 'start', 'state', 'statement', 'station', 'stay', 'step', 'still',
+            'stock', 'stop', 'store', 'story', 'strategy', 'street', 'strong', 'structure', 'student', 'study',
+            'stuff', 'style', 'subject', 'success', 'successful', 'such', 'suddenly', 'suffer', 'suggest',
+            'summer', 'support', 'sure', 'surface', 'system', 'table', 'take', 'talk', 'task', 'tax', 'teach',
+            'teacher', 'team', 'technology', 'television', 'tell', 'ten', 'tend', 'term', 'test', 'than', 'thank',
+            'that', 'the', 'their', 'them', 'themselves', 'then', 'theory', 'there', 'these', 'they', 'thing',
+            'think', 'third', 'this', 'those', 'though', 'thought', 'thousand', 'threat', 'three', 'through',
+            'throughout', 'throw', 'thus', 'time', 'today', 'together', 'tonight', 'too', 'top', 'total', 'tough',
+            'toward', 'town', 'trade', 'traditional', 'training', 'travel', 'treat', 'treatment', 'tree', 'trial',
+            'trip', 'trouble', 'true', 'truth', 'try', 'turn', 'two', 'type', 'under', 'understand', 'unit',
+            'until', 'upon', 'use', 'usually', 'value', 'various', 'very', 'victim', 'view', 'violence', 'visit',
+            'voice', 'vote', 'wait', 'walk', 'wall', 'want', 'war', 'watch', 'water', 'way', 'weapon', 'wear',
+            'week', 'weigh', 'welcome', 'well', 'west', 'western', 'what', 'whatever', 'when', 'where', 'whether',
+            'which', 'while', 'white', 'who', 'whole', 'whom', 'whose', 'why', 'wide', 'wife', 'will', 'win',
+            'wind', 'window', 'wish', 'with', 'within', 'without', 'woman', 'wonder', 'word', 'work', 'worker',
+            'world', 'worry', 'would', 'write', 'writer', 'wrong', 'yard', 'yeah', 'year', 'yes', 'yet', 'you',
+            'young', 'your', 'yourself'
+        ];
+
+        const timeLeftEl = document.getElementById('time-left');
+        const wpmEl = document.getElementById('wpm');
+        const accuracyEl = document.getElementById('accuracy');
+        const wordDisplayEl = document.getElementById('word-display');
+        const typingInputEl = document.getElementById('typing-input');
+        const startBtn = document.getElementById('start-btn');
+        const themeToggle = document.getElementById('theme-toggle');
+        const profilePicEl = document.getElementById('profile-pic');
+        const photoUploadEl = document.getElementById('photo-upload');
+        const removePhotoBtn = document.getElementById('remove-photo-btn');
+
+        let timer;
+        let timeLeft = 60;
+        let wpm = 0;
+        let accuracy = 100;
+        let isPlaying = false;
+        let typedWords = 0;
+        let correctChars = 0;
+        let totalChars = 0;
+        let wordIndex = 0;
+        let startTime;
+
+        // --- Event Listeners ---
+        startBtn.addEventListener('click', startGame);
+        typingInputEl.addEventListener('input', handleTyping);
+        themeToggle.addEventListener('change', toggleTheme);
+        photoUploadEl.addEventListener('change', loadProfilePicture);
+        removePhotoBtn.addEventListener('click', removeProfilePicture);
+
+        // --- Theme ---
+        function toggleTheme() {
+            if (themeToggle.checked) {
+                document.body.classList.remove('light-mode');
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+            }
+        }
+
+        // --- Profile Picture ---
+        function loadProfilePicture(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    profilePicEl.src = event.target.result;
+                    removePhotoBtn.style.display = 'inline-block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeProfilePicture() {
+            profilePicEl.src = 'https://i.ibb.co/T1g1x6b/default-avatar.png';
+            photoUploadEl.value = ''; // Reset file input
+            removePhotoBtn.style.display = 'none';
+        }
+
+        // --- Game Logic ---
+        function startGame() {
+            if (isPlaying) return;
+
+            isPlaying = true;
+            timeLeft = 60;
+            typedWords = 0;
+            correctChars = 0;
+            totalChars = 0;
+            wordIndex = 0;
+            startTime = new Date().getTime();
+            
+            typingInputEl.value = '';
+            typingInputEl.disabled = false;
+            typingInputEl.focus();
+            
+            startBtn.textContent = 'Playing...';
+            startBtn.disabled = true;
+
+            showWord();
+            timer = setInterval(updateTimer, 1000);
+        }
+
+        function showWord() {
+            wordIndex = Math.floor(Math.random() * words.length);
+            wordDisplayEl.textContent = words[wordIndex];
+        }
+
+        function handleTyping() {
+            if (!isPlaying) return;
+
+            const currentWord = wordDisplayEl.textContent;
+            const typedValue = typingInputEl.value;
+
+            if (typedValue.endsWith(' ')) {
+                checkWord(typedValue.trim(), currentWord);
+                typingInputEl.value = '';
+                showWord();
+            }
+        }
+
+        function checkWord(typedWord, originalWord) {
+            typedWords++;
+            totalChars += originalWord.length;
+            for(let i = 0; i < typedWord.length; i++) {
+                if (i < originalWord.length && typedWord[i] === originalWord[i]) {
+                    correctChars++;
+                }
+            }
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            timeLeftEl.textContent = timeLeft + 's';
+
+            if (timeLeft === 0) {
+                gameOver();
+            }
+            
+            updateStats();
+        }
+        
+        function updateStats() {
+            const timeElapsed = (new Date().getTime() - startTime) / 1000; // in seconds
+            
+            // WPM Calculation
+            const grossWPM = (totalChars / 5) / (timeElapsed / 60);
+            wpmEl.textContent = Math.round(grossWPM > 0 ? grossWPM : 0);
+
+            // Accuracy Calculation
+            const currentAccuracy = totalChars > 0 ? (correctChars / totalChars) * 100 : 100;
+            accuracyEl.textContent = Math.round(currentAccuracy) + '%';
+        }
+
+        function gameOver() {
+            clearInterval(timer);
+            isPlaying = false;
+            typingInputEl.disabled = true;
+            wordDisplayEl.textContent = 'Game Over!';
+            startBtn.textContent = 'Start Game';
+            startBtn.disabled = false;
+        }
+
+    </script>
+</body>
+</html>
